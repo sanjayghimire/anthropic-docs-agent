@@ -16,7 +16,7 @@ supabase = create_client(
 )
 
 # ── Settings ──────────────────────────────────────────
-MODEL         = "claude-sonnet-4-5"
+MODEL         = "claude-haiku-4-5"
 MAX_TOKENS    = 1024
 EMBED_MODEL   = "text-embedding-3-small"
 

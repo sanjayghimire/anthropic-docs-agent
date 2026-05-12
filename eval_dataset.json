@@ -1,0 +1,62 @@
+[
+  {
+    "id": "Q1",
+    "question": "What are the main Claude model families?",
+    "expected": "Claude has three model families: Opus (most capable), Sonnet (balanced), and Haiku (fastest)"
+  },
+  {
+    "id": "Q2",
+    "question": "What is the purpose of the system prompt in Claude API?",
+    "expected": "The system prompt sets context, instructions, and persona for Claude before the conversation begins"
+  },
+  {
+    "id": "Q3",
+    "question": "How do you enable streaming responses in the Claude API?",
+    "expected": "Set stream=True in the API call to receive server-sent events as tokens are generated"
+  },
+  {
+    "id": "Q4",
+    "question": "What is tool use in Claude?",
+    "expected": "Tool use allows Claude to call external functions or APIs defined by the developer to get information or take actions"
+  },
+  {
+    "id": "Q5",
+    "question": "What is the Messages API?",
+    "expected": "The Messages API is the main API endpoint for sending messages to Claude and receiving responses"
+  },
+  {
+    "id": "Q6",
+    "question": "How does Claude handle context windows?",
+    "expected": "Claude has a context window that limits the total tokens in a conversation including input and output"
+  },
+  {
+    "id": "Q7",
+    "question": "What is prompt caching in Claude?",
+    "expected": "Prompt caching allows reusing previous conversation context to reduce costs and latency"
+  },
+  {
+    "id": "Q8",
+    "question": "What are Claude's vision capabilities?",
+    "expected": "Claude can analyze images including photos, charts, graphs and answer questions about visual content"
+  },
+  {
+    "id": "Q9",
+    "question": "What is the difference between Claude Opus and Claude Haiku?",
+    "expected": "Opus is the most capable and intelligent model while Haiku is the fastest and most lightweight model"
+  },
+  {
+    "id": "Q10",
+    "question": "How do you count tokens in Claude API?",
+    "expected": "You can use the token counting API endpoint to count tokens before sending a request"
+  },
+  {
+    "id": "Q11",
+    "question": "What is constitutional AI?",
+    "expected": "Constitutional AI is Anthropic's method for training AI to be helpful, harmless and honest using a set of principles"
+  },
+  {
+    "id": "Q12",
+    "question": "What languages does Claude support?",
+    "expected": "Claude supports multiple languages and performs well across different languages though English performance is strongest"
+  }
+]
