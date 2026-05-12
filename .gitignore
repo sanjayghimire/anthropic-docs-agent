@@ -1,0 +1,12 @@
+# Virtual environment — don't push this (it's huge and machine-specific)
+venv/
+
+# Secret keys — NEVER push this to GitHub
+.env
+
+# Python cache files — auto-generated, not needed
+__pycache__/
+*.pyc
+
+# VS Code settings
+.vscode/
