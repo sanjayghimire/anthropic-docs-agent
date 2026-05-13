@@ -11,7 +11,7 @@ Built as a qualification project for the Senior AI Builder role at Ovidius AI.
 
 - Ingests Anthropic's official llms-full.txt into a Supabase pgvector database
 - Answers natural language questions with citations back to source URLs
-- Uses a Claude Managed Agent with a custom `search_docs` tool
+- Uses a Claude Managed Agent with a custom search_docs tool
 - Exposes a FastAPI endpoint for single-turn and multi-turn Q&A
 - Includes an LLM-as-judge evaluation suite with 12 golden Q&A pairs
 
@@ -19,19 +19,26 @@ Built as a qualification project for the Senior AI Builder role at Ovidius AI.
 
 ## Architecture
 User Question
-↓
+|
+v
 FastAPI endpoint (/ask or /chat)
-↓
+|
+v
 Claude Managed Agent (agent.py)
-↓
+|
+v
 Claude calls search_docs tool
-↓
-search_docs embeds query → Supabase pgvector similarity search
-↓
+|
+v
+search_docs embeds query --> Supabase pgvector similarity search
+|
+v
 Top 5 most relevant chunks returned
-↓
-Claude reads chunks → synthesizes answer with citations
-↓
+|
+v
+Claude reads chunks and synthesizes answer with citations
+|
+v
 Response with answer + source URLs
 
 ---
@@ -66,23 +73,22 @@ anthropic-docs-agent/
 ## How the Agent Works
 
 This is Option A from the brief — a Claude Managed Agent with a custom tool.
-
-User sends question to /ask or /chat endpoint
-FastAPI passes question to run_agent() in agent.py
-Claude receives question + search_docs tool definition
-Claude decides to call search_docs tool
-search_docs embeds the question with OpenAI
-Supabase finds top 5 most similar chunks
-Claude reads those chunks
-Claude writes answer with source citations
-Response returned to user
-
+Step 1 - User sends question to /ask or /chat endpoint
+Step 2 - FastAPI passes question to run_agent() in agent.py
+Step 3 - Claude receives question + search_docs tool definition
+Step 4 - Claude decides to call search_docs tool
+Step 5 - search_docs embeds the question with OpenAI
+Step 6 - Supabase finds top 5 most similar chunks
+Step 7 - Claude reads those chunks
+Step 8 - Claude writes answer with source citations
+Step 9 - Response returned to user
 
 Key point — Claude decides WHEN to call the tool based on the tool
 description. It only searches when it needs information. Simple
 greetings get answered without hitting the database at all.
 
 ### Session Management
+
 Multi-turn conversations work by storing message history in a
 dictionary keyed by session_id. Each follow-up question includes
 the full conversation history so Claude remembers context across turns.
@@ -166,7 +172,6 @@ Auto-generated API docs at `http://127.0.0.1:8000/docs`
 ### 7. Ask a single question
 
 ```powershell
-# Windows PowerShell
 $r = Invoke-WebRequest -Uri "http://127.0.0.1:8000/ask" `
   -Method POST `
   -ContentType "application/json" `
@@ -178,7 +183,7 @@ $r.Content
 ### 8. Multi-turn conversation
 
 ```powershell
-# First question
+# First question - copy session_id from response
 $r = Invoke-WebRequest -Uri "http://127.0.0.1:8000/chat" `
   -Method POST `
   -ContentType "application/json" `
@@ -186,7 +191,7 @@ $r = Invoke-WebRequest -Uri "http://127.0.0.1:8000/chat" `
   -UseBasicParsing
 $r.Content
 
-# Copy session_id from response, then ask follow up
+# Follow up using session_id from above
 $r2 = Invoke-WebRequest -Uri "http://127.0.0.1:8000/chat" `
   -Method POST `
   -ContentType "application/json" `
@@ -205,7 +210,7 @@ python eval.py
 
 Actual results from this submission:
 =======================================================
-Anthropic Docs Agent — Evaluation Suite
+Anthropic Docs Agent - Evaluation Suite
 Q1: What are the main Claude model families?    Score: 4/5 ✅
 Q2: What is the purpose of the system prompt?   Score: 4/5 ✅
 Q3: How do you enable streaming responses?      Score: 5/5 ✅
@@ -213,12 +218,12 @@ Q4: What is tool use in Claude?                 Score: 5/5 ✅
 Q5: What is the Messages API?                   Score: 5/5 ✅
 Average Score : 4.6 / 5.0
 Pass Rate     : 5 / 5 (100%)
-Weakest Q     : Q1 — version numbers may go stale
+Weakest Q     : Q1 - version numbers may go stale
 
 > **Note:** Dataset has 12 questions in eval_dataset.json.
-> Running 5 due to rate limits on low API tier — Sonnet has
-> 8,000 output tokens per minute. With a higher tier all 12
-> run in under 60 seconds using async parallel calls.
+> Running 5 due to rate limits on low API tier.
+> With a higher tier all 12 run in under 60 seconds
+> using async parallel calls.
 
 Full results saved to `eval_report.json` after each run.
 
@@ -249,17 +254,16 @@ quality at scale.
 
 ### Why OpenAI embeddings?
 Tried free local embedding libraries first but they all required Rust or
-C++ compiler tools that fail on Windows — setup friction for anyone
-trying to run this. OpenAI embeddings cost under $0.50 for full ingestion
-and work everywhere with just an API key.
+C++ compiler tools that fail on Windows. OpenAI embeddings cost under
+$0.50 for full ingestion and work everywhere with just an API key.
 
 ---
 
-## Tradeoffs & What I'd Do Next
+## Tradeoffs & What I Would Do Next
 
 | What I Built | Production Approach |
 |---|---|
-| In-memory session store | Redis for persistence + scaling |
+| In-memory session store | Redis for persistence and scaling |
 | Fixed character chunking | Semantic chunking at topic boundaries |
 | Vector-only search | Hybrid BM25 + vector with RRF fusion |
 | No re-ranking | Cross-encoder re-ranker for precision |
@@ -272,9 +276,9 @@ and work everywhere with just an API key.
 **If this were day one of the job:**
 
 1. **Hybrid search** — pgvector + PostgreSQL full-text with Reciprocal
-   Rank Fusion so exact keyword queries don't get missed
+   Rank Fusion so exact keyword queries do not get missed
 2. **Streaming responses** — SSE so answers appear token by token
 3. **Re-ingestion webhook** — triggered when Anthropic updates their
    docs so the database never goes stale
-4. **Redis + async eval** — sessions that persist across restarts,
-   all 12 eval questions running in parallel
+4. **Redis + async eval** — sessions that persist across restarts
+   and all 12 eval questions running in parallel
